@@ -11,7 +11,7 @@ from downloader import TwitterDownloader
 logger = logging.getLogger(__name__)
 
 TWITTER_URL_PATTERN = re.compile(
-    r'https?://(?:www\.)?(?:twitter\.com|x\.com)/\w+/status/\d+',
+    r'https?://(?:www\.)?(?:twitter\.com|x\.com)/(?:\w+/status|i/status)/\d+',
     re.IGNORECASE
 )
 
@@ -25,7 +25,8 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "Kirimkan link tweet dan aku akan download medianya untuk kamu.\n\n"
         "📌 <b>Format URL yang didukung:</b>\n"
         "• <code>https://twitter.com/user/status/ID</code>\n"
-        "• <code>https://x.com/user/status/ID</code>\n\n"
+        "• <code>https://x.com/user/status/ID</code>\n"
+        "• <code>https://x.com/i/status/ID</code>\n\n"
         "🎬 Support video, GIF, dan gambar\n\n"
         "Ketik /help untuk bantuan lebih lanjut."
     )
@@ -94,10 +95,8 @@ async def download_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 reply_markup=reply_markup,
                 parse_mode=ParseMode.HTML
             )
-            # Simpan info di context untuk callback
             context.user_data["media_info"] = info
         else:
-            # Langsung download
             await status_msg.edit_text("⬇️ Sedang mendownload...")
             await _send_media(update, context, status_msg, url, info)
 
