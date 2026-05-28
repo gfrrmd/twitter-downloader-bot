@@ -26,7 +26,6 @@ async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "📌 <b>Format URL yang didukung:</b>\n"
         "• <code>https://twitter.com/user/status/ID</code>\n"
         "• <code>https://x.com/user/status/ID</code>\n\n"
-        "✅ Support konten age-restricted (18+)\n"
         "🎬 Support video, GIF, dan gambar\n\n"
         "Ketik /help untuk bantuan lebih lanjut."
     )
@@ -41,12 +40,10 @@ async def help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "2. Paste dan kirim ke bot ini\n"
         "3. Tunggu bot memproses\n"
         "4. Pilih kualitas jika ada beberapa pilihan\n\n"
-        "🍪 <b>Untuk konten age-restricted:</b>\n"
-        "Bot sudah dikonfigurasi dengan cookie Twitter. "
-        "Pastikan admin sudah mengisi TWITTER_AUTH_TOKEN dan TWITTER_CT0 di config.\n\n"
         "⚠️ <b>Batasan:</b>\n"
         f"• Ukuran file maksimal: {os.getenv('MAX_FILE_SIZE', 50)} MB\n"
-        "• Hanya URL Twitter/X yang valid"
+        "• Hanya URL Twitter/X yang valid\n"
+        "• Hanya konten publik yang dapat didownload"
     )
     await update.message.reply_text(text, parse_mode=ParseMode.HTML)
 
@@ -104,6 +101,18 @@ async def download_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await status_msg.edit_text("⬇️ Sedang mendownload...")
             await _send_media(update, context, status_msg, url, info)
 
+    except ValueError as e:
+        err = str(e)
+        if "No video could be found" in err:
+            await status_msg.edit_text(
+                "❌ Tidak ada media di tweet ini.\n"
+                "Bot hanya bisa download tweet yang mengandung video atau GIF."
+            )
+        else:
+            await status_msg.edit_text(
+                f"❌ Terjadi kesalahan: <code>{err[:200]}</code>",
+                parse_mode=ParseMode.HTML
+            )
     except Exception as e:
         logger.error(f"Error saat download {url}: {e}", exc_info=True)
         await status_msg.edit_text(

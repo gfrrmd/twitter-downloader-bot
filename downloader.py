@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 def _get_ytdlp_opts(extra: dict = None) -> dict:
     """
     Bangun konfigurasi yt-dlp untuk download media Twitter publik.
+    Menggunakan syndication API sebagai fallback agar lebih kompatibel tanpa auth.
     """
     opts = {
         "quiet": True,
@@ -27,6 +28,11 @@ def _get_ytdlp_opts(extra: dict = None) -> dict:
                 "AppleWebKit/537.36 (KHTML, like Gecko) "
                 "Chrome/124.0.0.0 Safari/537.36"
             ),
+        },
+        "extractor_args": {
+            "twitter": {
+                "api": ["syndication"],  # Lebih stabil tanpa auth
+            }
         },
     }
 
