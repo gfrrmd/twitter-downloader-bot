@@ -15,31 +15,18 @@ logger = logging.getLogger(__name__)
 
 def _get_ytdlp_opts(extra: dict = None) -> dict:
     """
-    Bangun konfigurasi yt-dlp dengan cookie Twitter.
-    Cookie auth_token + ct0 diperlukan untuk konten age-restricted.
+    Bangun konfigurasi yt-dlp untuk download media Twitter publik.
     """
-    auth_token = os.getenv("TWITTER_AUTH_TOKEN", "")
-    ct0 = os.getenv("TWITTER_CT0", "")
-
     opts = {
         "quiet": True,
         "no_warnings": True,
         "nocheckcertificate": True,
-        # Inject cookie Twitter untuk bypass age-restriction
         "http_headers": {
             "User-Agent": (
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                 "AppleWebKit/537.36 (KHTML, like Gecko) "
                 "Chrome/124.0.0.0 Safari/537.36"
             ),
-            "Cookie": f"auth_token={auth_token}; ct0={ct0};",
-            "x-csrf-token": ct0,
-            "Authorization": "Bearer AAAAAAAAAAAAAAAAAAAAANRILgAAAAAAnNwIzUejRCOuH5E6I8xnZz4puTs%3D1Zv7ttfk8LF81IUq16cHjhLTvJu4FA33AGWWjCpTnA",
-        },
-        "extractor_args": {
-            "twitter": {
-                "api": ["graphql"],  # Gunakan GraphQL API (lebih reliable untuk age-restricted)
-            }
         },
     }
 
